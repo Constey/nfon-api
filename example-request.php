@@ -257,6 +257,300 @@ function getSkillLoginStatus ($extensionNumber) {
         return $response["result"];
     }
 }
+// Ankündigung Anzeigen
+function getAccouncement ($announcementNumber) {
+    if ($announcementNumber == 553263) { $logReason = "Ansage IT Störung"; } elseif ($announcementNumber == 225143) { $logReason = "Ansage IT Normal"; } else { $logReason = "Sprachdialog " . $announcementNumber . " Unbekannt"; }
+    $data = "";
+    $easyURI = "/announcements/" . $announcementNumber;
+    $method = "GET";
+    $response = apiRequest ($easyURI, $method, $data);
+    /*echo "<pre>"; print_r($response); echo "</pre>";
+    print_r(json_decode($response["result"]));
+    */
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 200) { 
+        "Success"; 
+        return json_decode($response["result"]); 
+    } elseif ($response["http_code"] == 404 ) {
+         "Not found"; 
+         return $json_decode($response["result"]);
+    } else {
+        // Fehler
+        return $json_decode($response["result"]);
+    }
+}
+
+function getAccouncements () {
+    $data = "";
+    $easyURI = "/announcements?_offset=0&_pagesize=100";
+    $method = "GET";
+    $response = apiRequest ($easyURI, $method, $data);
+    echo "<pre>"; print_r($response); echo "</pre>";
+    print_r(json_decode($response["result"]));
+}
+
+
+function activateOptionCoach ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    // Wenn Coach gesetzt ist , geht kein Coachee?
+    $data = '{"data": [{"name": "isCoach","value": true}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        insertLogEntry ($GLOBALS['username'], " Coach Funktion aktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        insertLogEntry ($GLOBALS['username'], " Coach Funktion aktiviert.", "false");
+        return $response;
+    }
+}
+function deactivateOptionCoach ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = '{"data": [{"name": "isCoach","value": false}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>";
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        insertLogEntry ($GLOBALS['username'], " Coach Funktion deaktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        insertLogEntry ($GLOBALS['username'], " Coach Funktion deaktiviert.", "false");
+        return $response;
+    }
+}
+function activateOptionCoachee ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    // Wenn Coach gesetzt ist , geht kein Coachee?
+    $data = '{"data": [{"name": "isCoachee","value": true}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>";
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion aktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion aktiviert.", "false");
+        return $response;
+    }
+}
+function deactivateOptionCoachee ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = '{"data": [{"name": "isCoachee","value": false}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>";
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion deaktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion deaktiviert.", "false");
+        return $response;
+    }
+}
+function getOptionCoach ($extensionNumber) {
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = "";
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "GET";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>"; 
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 200) { 
+        "Success"; 
+        try {
+            $coachStatusResponse = json_decode($response["result"]);
+            //echo "<pre>"; print_r($coachStatusResponse); echo "</pre>"; 
+            $coachStatus = $coachStatusResponse->data;
+            //echo "<pre>"; print_r($coachStatusResponse->data); echo "</pre>"; 
+            $coach = "-";
+            foreach ($coachStatus as $dataentry) {
+                
+                if ($dataentry->name == "isCoach") {
+                    $coach = $dataentry->value;
+                    //echo "<pre>"; print_r($dataentry->name); echo "</pre>"; 
+                    //echo "<pre>"; print_r($dataentry->value); echo "</pre>"; 
+                }
+            }
+           if ($coach == 1 || $coach == true) {
+                // Coach aktiv
+                return true;
+            } elseif ($coach == 0 || $coach == false)  {
+                // Coach inaktiv
+                return false;
+            } else {
+                return "Fehler beim Abfragen - kein Coach Attribut gefunden";
+            }
+        }  catch (Exception $e) {
+            return $e->getMessage();
+        }
+    } else {
+        return $response["result"];
+    }
+}
+function getOptionCoachee ($extensionNumber) {
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = "";
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "GET";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>"; 
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 200) { 
+        "Success"; 
+        try {
+            $coachStatusResponse = json_decode($response["result"]);
+            //echo "<pre>"; print_r($coachStatusResponse); echo "</pre>"; 
+            $coachStatus = $coachStatusResponse->data;
+            //echo "<pre>"; print_r($coachStatusResponse->data); echo "</pre>"; 
+            $coachee = "-";
+            foreach ($coachStatus as $dataentry) {
+                
+                if ($dataentry->name == "isCoachee") {
+                    $coachee = $dataentry->value;
+                    //echo "<pre>"; print_r($dataentry->name); echo "</pre>"; 
+                    //echo "<pre>"; print_r($dataentry->value); echo "</pre>"; 
+                }
+            }
+           if ($coachee == 1 || $coachee == true) {
+                // Coach aktiv
+                return true;
+            } elseif ($coachee == 0 || $coachee == false)  {
+                // Coach inaktiv
+                return false;
+            } else {
+                return "Fehler beim Abfragen - kein Coach Attribut gefunden";
+            }
+        }  catch (Exception $e) {
+            return $e->getMessage();
+        }
+    } else {
+        return $response["result"];
+    }
+}
+function getOptionNcontrolLogin ($extensionNumber) {
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = "";
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "GET";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>"; 
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 200) { 
+        "Success"; 
+        try {
+            $optionhStatusResponse = json_decode($response["result"]);
+            //echo "<pre>"; print_r($optionhStatusResponse); echo "</pre>"; 
+            $optionStatus = $optionhStatusResponse->data;
+            //echo "<pre>"; print_r($optionhStatusResponse->data); echo "</pre>"; 
+            $option = "-";
+            foreach ($optionStatus as $dataentry) {
+                
+                if ($dataentry->name == "ncontrolEnabled") {
+                    $option = $dataentry->value;
+                    //echo "<pre>"; print_r($dataentry->name); echo "</pre>"; 
+                    //echo "<pre>"; print_r($dataentry->value); echo "</pre>"; 
+                }
+            }
+           if ($option == 1 || $option == true) {
+                // option aktiv
+                return true;
+            } elseif ($option == 0 || $option == false)  {
+                // option inaktiv
+                return false;
+            } else {
+                return "Fehler beim Abfragen - kein ncontrolEnabled Attribut gefunden";
+            }
+        }  catch (Exception $e) {
+            return $e->getMessage();
+        }
+    } else {
+        return $response["result"];
+    }
+}
+function deactivateOptionNcontrolLogin ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    $data = '{"data": [{"name": "ncontrolEnabled","value": false}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>";
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        insertLogEntry ($GLOBALS['username'], " ncontrolEnabled Funktion deaktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        insertLogEntry ($GLOBALS['username'], " ncontrolEnabled Funktion deaktiviert.", "false");
+        return $response;
+    }
+}
+function activateOptionNcontrolLogin ($extensionNumber) {
+    // Mithör Funktion aktivieren Coach // Coachee
+    // Warum auch immer kommt hier ein Connection Failed zurück. Aktivierung klappt aber dennoch.
+    if (!preg_match('/^[0-9][0-9][0-9]$/', $extensionNumber)) {
+        die("Keine gültige Telefonnummer");
+    } 
+    // Wenn Coach gesetzt ist , geht kein Coachee?
+    $data = '{"data": [{"name": "ncontrolEnabled","value": true}]}';
+    $easyURI = "/targets/phone-extensions/" . $extensionNumber;
+    $method = "PUT";
+    $response = apiRequest ($easyURI, $method, $data);
+    //echo "<pre>"; print_r($response); echo "</pre>";
+    if ($GLOBALS['debug']){ echo "<pre>"; print_r($response); echo "</pre>"; }
+    if ($response["http_code"] == 0 || $response["http_code"] == 201 || $response["http_code"] == 204) { 
+        "Success"; 
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion aktiviert.", "true");
+        return true; 
+    } else {
+        // Fehler
+        //insertLogEntry ($GLOBALS['username'], " Coachee Funktion aktiviert.", "false");
+        return $response;
+    }
+}
 
 //addExtensionInSkill ("1", "317");
 //removeExtensionInSkill ("1", "317");
